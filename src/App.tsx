@@ -13,6 +13,12 @@ const detector = new BarcodeDetectorPolyfill({ formats: ["ean_13"] });
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [barcodesList, setBarcodesList] = useState<
+    Array<{
+      rawValue: string;
+      date: Date;
+    }>
+  >([]);
 
   useEffect(() => {
     async function setup() {
@@ -45,43 +51,28 @@ function App() {
 
       const context = canvasRef.current.getContext("2d");
 
-      // Define the source region (in this case, take the left half of the video)
-      const sourceX = videoRef.current.videoWidth / 2; // X-coordinate of the top-left corner of the source region
-      const sourceY = videoRef.current.videoHeight / 2; // Y-coordinate of the top-left corner of the source region
-      const sourceWidth = 200; // Width of the source region
-      const sourceHeight = 100; // Height of the source region
-
-      // Define the destination region (to draw on the canvas)
-      const destX = 0; // X-coordinate of the top-left corner of the destination region
-      const destY = 0; // Y-coordinate of the top-left corner of the destination region
-      const destWidth = sourceWidth; // Width of the destination region (same as source)
-      const destHeight = sourceHeight; // Height of the destination region (same as source)
-
       // Draw the left half of the video on the canvas
       context?.drawImage(
         videoRef.current, // Source video element
-        sourceX,
-        sourceY,
-        sourceWidth,
-        sourceHeight, // Source region
-        destX,
-        destY,
-        destWidth,
-        destHeight // Destination region
+        0,
+        0,
+        videoRef.current.videoWidth,
+        videoRef.current.videoHeight
       );
 
       if (videoRef.current.videoWidth > 0 && context) {
         const imageData = context.getImageData(
           0,
           0,
-          canvas.width,
-          canvas.height
+          videoRef.current.videoWidth,
+          videoRef.current.videoHeight
         );
 
         const barcodes = await detector.detect(imageData);
 
         if (barcodes.length > 0) {
-          console.log(barcodes[0].rawValue);
+          const a = barcodes[0].rawValue;
+          setBarcodesList([...barcodesList, { rawValue: a, date: new Date() }]);
         }
       }
 
@@ -97,8 +88,11 @@ function App() {
 
   return (
     <OnlineGuard>
-      <video ref={videoRef} autoPlay playsInline />
+      <video ref={videoRef} autoPlay playsInline style={{ display: "none" }} />
       <canvas ref={canvasRef} />
+      {barcodesList.map(({ rawValue, date }) => (
+        <div key={date.toISOString()}>{rawValue}</div>
+      ))}
     </OnlineGuard>
   );
 }

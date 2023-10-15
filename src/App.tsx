@@ -10,19 +10,57 @@ function OnlineGuard({ children }: { children: React.ReactNode }) {
 
 const detector = new BarcodeDetectorPolyfill({ formats: ["ean_13"] });
 
+async function fetchEan(ean: string) {
+  const response = await fetch(`api/get-product?ean=${ean}`);
+  const data = await response.json();
+  return data as {
+    name: string;
+    rohlikPrice: {
+      amount: number;
+    };
+  };
+}
+
+function ProductFound({
+  name,
+  price,
+  onClick,
+}: {
+  name: string;
+  price: number;
+  onClick: () => void;
+}) {
+  return (
+    <div id="product-found">
+      <div className="wrapper">
+        <h1>
+          Product {name} found - {price} CZK
+        </h1>
+        <button onClick={onClick}>OK</button>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [barcodesList, setBarcodesList] = useState<
-    Array<{
-      rawValue: string;
-      date: Date;
-    }>
-  >([]);
+  const [scanning, setScanning] = useState(true);
+  const [productFound, setProductFound] = useState<{
+    name: string;
+    rohlikPrice: {
+      amount: number;
+    };
+  } | null>(null);
 
   useEffect(() => {
     async function setup() {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: import.meta.env.DEV
+          ? true
+          : {
+              facingMode: "environment",
+            },
+      });
 
       if (!videoRef.current) {
         return;
@@ -31,68 +69,56 @@ function App() {
       videoRef.current.srcObject = stream;
     }
 
-    setup();
-  }, []);
-
-  useEffect(() => {
-    async function swag() {
+    async function detectingLoop() {
       if (!videoRef.current) {
         return;
       }
 
-      if (!canvasRef.current) {
-        return;
-      }
-
-      const canvas = canvasRef.current;
-
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-
-      const context = canvasRef.current.getContext("2d");
-
-      // Draw the left half of the video on the canvas
-      context?.drawImage(
-        videoRef.current, // Source video element
-        0,
-        0,
-        videoRef.current.videoWidth,
-        videoRef.current.videoHeight
-      );
-
-      if (videoRef.current.videoWidth > 0 && context) {
-        const imageData = context.getImageData(
-          0,
-          0,
-          videoRef.current.videoWidth,
-          videoRef.current.videoHeight
-        );
-
-        const barcodes = await detector.detect(imageData);
+      if (videoRef.current.videoWidth > 0 && scanning) {
+        const barcodes = await detector.detect(videoRef.current);
 
         if (barcodes.length > 0) {
-          const a = barcodes[0].rawValue;
-          setBarcodesList([...barcodesList, { rawValue: a, date: new Date() }]);
+          const value = barcodes[0].rawValue;
+
+          const product = await fetchEan(value);
+          setProductFound(product);
+          cancelAnimationFrame(animationFrame);
+          setScanning(false);
+
+          return;
         }
       }
 
-      requestAnimationFrame(swag);
+      requestAnimationFrame(detectingLoop);
     }
 
-    const a = requestAnimationFrame(swag);
+    let animationFrame: number;
+    if (scanning) {
+      animationFrame = requestAnimationFrame(detectingLoop);
+    }
+
+    setup();
 
     return () => {
-      cancelAnimationFrame(a);
+      animationFrame && cancelAnimationFrame(animationFrame);
     };
-  }, []);
+  }, [scanning]);
 
   return (
     <OnlineGuard>
-      <video ref={videoRef} autoPlay playsInline style={{ display: "none" }} />
-      <canvas ref={canvasRef} />
-      {barcodesList.map(({ rawValue, date }) => (
-        <div key={date.toISOString()}>{rawValue}</div>
-      ))}
+      {productFound && (
+        <ProductFound
+          name={productFound.name}
+          price={productFound.rohlikPrice.amount}
+          onClick={() => {
+            setProductFound(null);
+            setScanning(true);
+          }}
+        />
+      )}
+      <div id="video-wrapper">
+        <video id="player" ref={videoRef} autoPlay playsInline />
+      </div>
     </OnlineGuard>
   );
 }

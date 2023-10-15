@@ -1451,6 +1451,20 @@
     "@typescript-eslint/types" "6.7.5"
     eslint-visitor-keys "^3.4.1"
 
+"@undecaf/barcode-detector-polyfill@^0.9.20":
+  version "0.9.20"
+  resolved "https://registry.yarnpkg.com/@undecaf/barcode-detector-polyfill/-/barcode-detector-polyfill-0.9.20.tgz#7fcc284a675c0b861f3d8323d882e948081e4201"
+  integrity sha512-fD/7WjfhhCPJjNzVUyP1TNv29YzrsD6DO9mTdH5Xi9fbpg4VJdsqjiFxkat4//j7Y2xEADXIxzC/SvGdjMxDng==
+  dependencies:
+    "@undecaf/zbar-wasm" "^0.9.15"
+
+"@undecaf/zbar-wasm@^0.9.15":
+  version "0.9.16"
+  resolved "https://registry.yarnpkg.com/@undecaf/zbar-wasm/-/zbar-wasm-0.9.16.tgz#ba404602ec90ae20b05fe83c8a68a4c50951f643"
+  integrity sha512-T5PcT6g+tLScGjR4WmnRErNvfKqEc3kRg2ux14wHmIDNbvNeXa0BkFK19PRK/jb6zGy5NyWtn4ko6KeNuZc/fQ==
+  dependencies:
+    jschardet "^3.0.0"
+
 "@vite-pwa/assets-generator@^0.0.10":
   version "0.0.10"
   resolved "https://registry.yarnpkg.com/@vite-pwa/assets-generator/-/assets-generator-0.0.10.tgz#3c9c3a21413b40f2e9f84c2441899c4074247511"
@@ -2661,6 +2675,11 @@ js-yaml@^4.1.0:
   dependencies:
     argparse "^2.0.1"
 
+jschardet@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/jschardet/-/jschardet-3.0.0.tgz#898d2332e45ebabbdb6bf2feece9feea9a99e882"
+  integrity sha512-lJH6tJ77V8Nzd5QWRkFYCLc13a3vADkh3r/Fi8HupZGWk2OVVDfnZP8V/VgQgZ+lzW0kG2UGb5hFgt3V3ndotQ==
+
 jsesc@^2.5.1:
   version "2.5.2"
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-2.5.2.tgz#80564d2e483dacf6e8ef209650a67df3f0c283a4"
@@ -3029,6 +3048,11 @@ prelude-ls@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.2.1.tgz#debc6489d7a6e6b0e7611888cec880337d316396"
   integrity sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==
+
+prettier@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.0.3.tgz#432a51f7ba422d1469096c0fdc28e235db8f9643"
+  integrity sha512-L/4pUDMxcNa8R/EthV08Zt42WBO4h1rarVtK0K+QJG0X187OLo7l699jWw0GKuwzkPQ//jMFA/8Xm6Fh3J/DAg==
 
 pretty-bytes@^5.3.0:
   version "5.6.0"
